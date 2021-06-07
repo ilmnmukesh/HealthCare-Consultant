@@ -1,0 +1,333 @@
+<div class="col-12 text-center mt-5">
+    <h1 class="text-info">Patient </h1>
+</div>
+
+<div class="container" id='patient_content'>
+    <div class="row" id="patient_list">
+        <div class="loader"></div>
+    </div>
+    <div class="text-center col-12 mt-3">
+        <small class="text-danger font-weight-bold" id="error"></small>
+    </div>
+</div>
+
+<div id="patient_main" class="container d-none">
+    <div class="text-left col-12 float-left">
+        <div class="h4 text-warning show_patient_id"></div>
+        <small class="text-danger font-weight-bold" id="error_pat"></small>
+    </div>
+    <div class="row col-12">
+        <div class="container col-6" id="patient_table">
+        </div>
+        <div class="container col-6 row" id="patient_doctor_list">
+            <div class="loader"></div>
+        </div>
+        <div class="col-6 d-none" id="pres_body">
+        </div>
+    </div>
+</div>
+
+<div id="patient_consult" class="container d-none">
+    <div class="text-center col-12 mt-2 mb-4">
+        <div class="h4 text-warning show_patient_id"></div>
+        <small class="text-danger font-weight-bold" id="error_cons"></small>
+    </div>
+    <div class="row col-12">
+        <div class="container col-2" id="patient_doc_min">
+        </div>
+        <div class="col-9" id="consultant">
+            <div class="row">
+                <div class="form-group col-8">
+                    <label for="name">Patient Name :</label>
+                    <input type="text" name="name" class="form-control" id="name" />
+                </div>
+                <div class="form-group col-4">
+                    <label for="age">Age :</label>
+                    <input type="number" name="age" class="form-control" id="age" />
+                </div>
+            </div>
+            <div class="form-radio row">
+                <label for="gender" class="radio-label ml-4">Gender :</label>
+                <div class="form-radio-item mx-5">
+                    <input type="radio" name="gender" value="Male" checked>
+                    <label for="male">Male</label>
+                    <span class="check"></span>
+                </div>
+                <div class="form-radio-item mx-5">
+                    <input type="radio" name="gender" value="Female">
+                    <label for="female">Female</label>
+                    <span class="check"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12 mt-4">
+                    <label for="symt">Disease Symptom :</label>
+                    <input type="text" name="symt" class="form-control" id="symt" required/>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <label for="add">Patient Problem :</label>
+                    <input type="text" name="add" class="form-control" id="add">
+                </div>
+            </div>
+            <div class="text-center mb-3">
+                <small class="font-weight-bold text-danger" id="consult_err"></small>
+            </div>
+            <div class="form-group offset-4 col-4">
+                <button id="submit_cons" class="btn btn-sm btn-info form-control">Send Problem</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+        showPatient()
+    })
+    async function showPatient() {
+        var html = ``
+        if (admin == undefined || contract == undefined) {
+            $("#patient_list").html(`
+                <div class="text-center col-12">
+                    <h1 class="text-danger mt-5">Admin or Contract is undefined<h1>
+                <div>
+                `)
+            return
+        }
+        await contr.methods.showDoctors().call({
+            from: admin,
+            gas: "3000000"
+        }).then(async e => {
+            if (e.length == 0) {
+                $("#doctor_list").html(`
+                <div class="text-center col-12">
+                    <h1 class="text-danger mt-5">There is No Doctor<h1>
+                <div>
+                `)
+                return
+            }
+            doctor_acc = e;
+            var html = ``
+            let sel = 0
+            await accounts.forEach((element, i) => {
+                if (!doctor_acc.includes(element)) {
+                    if (i == sel) {
+                        html += `<option value="${element}" selected>${element}</option> `
+                    } else {
+                        html += `<option value="${element}">${element}</option> `
+                    }
+                } else if (i == sel) {
+                    sel++
+                }
+            })
+
+            $("#patient_list").html(`
+                <div class="form-group col-6 offset-3 mt-5">
+                    <select class="custom-select btn btn-sm btn-outline-light" style="border-color:grey!important; color:grey"
+                     id="patient_id">
+                        ${html}
+                    </select>
+                </div>
+                <div class="col-4 form-group offset-4 mt-5">
+                    <button class="form-control btn btn-sm btn-info" onclick="showDoctorsForCurrentPatient()">Select</button>
+                </div>
+                `)
+
+        })
+    }
+
+    async function showDoctorsForCurrentPatient() {
+        current_patient = $("#patient_id").val()
+        $(".show_patient_id").html(current_patient)
+        $("#patient_content").addClass("d-none")
+        $("#patient_main").removeClass("d-none")
+
+        var html = `
+		<h1 class=""><small>Patient List</small></h1>
+		<table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Doctor Name</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Symptoms</th>
+                    <th scope="col">Problem</th>
+                    <th scope="col">Solution</th>
+                </tr>
+            </thead>
+            <tbody>`
+        let objects = []
+        await doctor_acc.forEach(async(element) => {
+            await contr.methods.showPatientProb(current_patient).call({
+                from: element,
+                gas: 3000000
+            }).then(data => {
+                objects.push(data)
+            }).catch(e => { // $("#error_pat").html(e.toString())
+            })
+        })
+        setTimeout(() => {
+                    if (objects.length != 0) {
+                        objects.forEach((data) => {
+                                    html += `
+                            <tr>
+                                <th scope="row">${JSON.parse(localStorage.getItem(data.refdoc)).name}</th>
+                                <th scope="row"><small>${data.name}</small></th>
+                                <th scope="row">${data.gender}</th>
+                                <th scope="row"><small>${data.age}</small></th>
+                                <th scope="row" class="text-danger">${data.symptom}</th>
+                                <th scope="row" class="text-warning">${data.problem}</th>
+                                <th scope="row" class="text-warning">
+                                    ${
+                                        !data.prescribed?
+                                        `<button class="btn btn-sm btn-danger" disabled >Waiting..</button>`:
+                                        `<button class="btn btn-sm btn-success" onclick="showPrescription('${data.id}')">Show</button>`
+                                    }
+                                </th>
+                            </tr>
+                        `  
+            })
+            setTimeout(() => {
+                     html += `</tbody></table>
+                     <button class="btn btn-sm ml-3 mt-5 btn-warning" onclick="goBack()">back</button>
+                     `
+                    $("#patient_table").html(html)
+                }, 1000)
+        }else{
+             $("#patient_table").html(`<p>No Consult avaliable<p><button class="btn btn-sm ml-3 mt-5 btn-warning" onclick="goBack()">back</button>`)
+        }  
+        }, 1000)
+        showDoctorsToPatient()
+    }
+
+    async function showDoctorsToPatient() {
+        html = ""
+        await doctor_acc.forEach(async id => {
+            await contr.methods.doctors(id).call({
+                from: admin,
+                gas: "300000"
+            }).then(async data => {
+                localStorage.setItem(data.id, JSON.stringify(data))
+                html += await `
+					<div class="col-6 mb-3">
+                        <div class="card" style="width: 20rem;">
+                            <img class="card-img-top" src="${data.image}" alt="Card image cap">
+                            <div class="card-body">
+                                <div>
+                                    <h6 class="my-0"><small class="text-info">Type: <span class="text-dark">${data.doctor_type}</span></small></h6>
+                                    <h6 class="my-0"><small class="text-info">Name: <span class="text-dark">${data.name}</span></small></h6>
+                                </div>
+                                <div class="form-group mt-3">
+                                    <button class="btn btn-sm btn-info form-control" onclick="doctorConsultant('${data.id}')">Consult Doctor</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					`
+            }).catch((err) => console.log(err.toString))
+        })
+        setTimeout(() => {
+            $("#patient_doctor_list").html(html)
+        }, 1000)
+    }
+
+    function goBack() {
+        $("#patient_content").removeClass("d-none")
+        $("#patient_main").addClass("d-none")
+    }
+
+    async function goBackPat() {
+        $("#patient_main").removeClass("d-none")
+        $("#patient_consult").addClass("d-none")
+       await showDoctorsForCurrentPatient()
+    }
+
+    function doctorConsultant(doct_id) {
+        $("#patient_main").addClass("d-none")
+        $("#patient_consult").removeClass("d-none")
+        let c = JSON.parse(localStorage.getItem(doct_id))
+        $("#patient_doc_min").html(`
+            <img src="${c.image}" width="100px" />
+            <div>
+                <small class=" font-weight-bold ml-4 mt-2 text-info">${c.doctor_type}</small><br>
+                <small class=" font-weight-bold ml-4 text-danger">${c.name}</small><br>
+            </div>
+            <button class="btn btn-sm ml-3 mt-5 btn-warning" onclick="goBackPat()">back</button>
+        `)
+
+        $("#submit_cons").attr("onclick", `consultantForm('${doct_id}')`)
+    }
+
+    function consultantForm(doct_id) {
+        let name_ = $("#name").val()
+        let age_ = $("#age").val()
+        let problem_ = $("#add").val()
+        let gender_ = $("input[name=gender]:checked").val()
+        let symptom_ = $("#symt").val()
+
+        if (name_ == "" || age_ == "" || problem_ == "" || symptom_ == "") {
+            $("#consult_err").html("All fields are required")
+            return
+        }
+
+        contr.methods.patient(doct_id, name_, age_, problem_, gender_, symptom_)
+            .send({
+                from: current_patient,
+                gas: 3000000
+            })
+            .then((e) => {
+                goBackPat()
+            }).catch(e => {
+                $("#consult_err").html(e.toString())
+            })
+    }
+
+    function showPrescription(doct_id){
+        contr.methods.showPrescription().call({
+            from: current_patient,
+            gas: "3000000"
+        }).then((e)=>{
+            var obj=JSON.parse(e);
+            let html=''
+            obj.forEach((e, i)=>{
+                html+=`
+                <tr>
+                    <th scope="row">${i+1}</th>
+                    <th scope="row"><small>${e.tablet}</small></th>
+                    <th scope="row">${e.time}</th>
+                    <th scope="row">${e.count}</th> 
+                </tr>                        
+                `
+            })
+
+            $("#pres_body").html(`
+                <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Tablet Name</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${html}
+                </tbody>
+                </table>
+                <div class="text-center">
+                <button class="btn btn-sm ml-3 mt-5 btn-warning" onclick="goBackToList()">back</button>
+                </div>
+            `)
+            $("#patient_doctor_list").addClass("d-none")
+            $("#pres_body").removeClass("d-none")
+        }).catch((e)=>{
+            console.log(e)
+        })
+    }
+    function goBackToList(){
+        $("#patient_doctor_list").removeClass("d-none")
+        $("#pres_body").addClass("d-none")
+    }
+</script>

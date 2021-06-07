@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="plugins/cubeportfolio/css/cubeportfolio.min.css">
+    <link href="css/nivo-lightbox.css" rel="stylesheet" />
+    <link href="css/nivo-lightbox-theme/default/default.css" rel="stylesheet" type="text/css" />
+    <link href="css/owl.carousel.css" rel="stylesheet" media="screen" />
+    <link href="css/owl.theme.css" rel="stylesheet" media="screen" />
+    <link href="css/animate.css" rel="stylesheet" />
+    <link href="css/style.css" rel="stylesheet">
+
+    <link id="bodybg" href="bodybg/bg1.css" rel="stylesheet" type="text/css" />
+    <!-- template skin -->
+    <link id="t-colors" href="color/default.css" rel="stylesheet">
+    <style>
+        .loader {
+            border: 12px solid #f3f3f3;
+            /* Light grey */
+            border-top: 12px solid #17a2b8;
+            /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+
+    <nav id="nav_bar_id" class="navbar navbar-custom navbar-static-top" role="navigation">
+        <div id="top_area" class="top-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-6 col-md-6">
+                        <p class="bold text-left">Monday - Saturday, 8am to 10pm </p>
+                    </div>
+                    <div class="col-sm-6 col-md-6">
+                        <p class="bold text-right">Call us now +0452 568 65 701</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light col-12">
+            <div class="navbar-header page-scroll col-5">
+                <button type="button" class="navbar-toggle " data-toggle="collapse" data-target=".navbar-main-collapse">
+                    <i class="fa fa-bars"></i>
+                </button>
+                <a class="navbar-brand mb-3" href="index.html">
+                    <img src="img/logoo.png" alt="" width="50" height="50" />
+                </a>
+                <a class="navbar-brand mt-4">HealthCare</a>
+            </div>
+            <div class="collapse navbar-collapse " id="navbarTogglerDemo01">
+                <ul class="nav navbar-nav ">
+                    <li id="home_act" class="active"><a href="#home" id="home">Home</a></li>
+                    <li id="admin_act"><a href="#admin" id="admin">Admin</a></li>
+                    <li id="doctor_act"><a href="#doctor" id="doctor">Doctor</a></li>
+                    <li id="patient_act"><a href="#patient" id="patient">Patient</a></li>
+
+                </ul>
+            </div>
+        </nav>
+        <!-- /.container -->
+    </nav>
+
+    <div id="home_content" class="col-lg-8 offset-lg-2">
+        <div class=" form-inline mt-5">
+            <div class="col-7">
+                <h4>Medical Contract using etherum</h4>
+            </div>
+            <div class="form-group col-4 text-center">
+                <label class="small font-weight-bold">Connecting to localhost:</label>
+                <input type="number " class="form-control" id="host" value=7545 aria-describedby="helpId" placeholder="Port">
+            </div>
+        </div>
+        <div class="  row mt-3">
+            <div class="col-2 ml-3">
+                <h5>Accounts</h5>
+            </div>
+            <div class="form-group col-6">
+                <select class="custom-select btn btn-sm btn-info" id="accounts">
+                    <option selected>Choose...</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                  </select>
+            </div>
+
+            <div class="col-3 mt-2">
+                <h6>Balance <span id="balance" class="text-danger"></span></h6>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-3 ml-3">
+                <h5>Artifacts File</h5>
+            </div>
+            <div class="form-group col-3 mb-5">
+                <form enctype="multipart/form-data">
+                    <input id="upload" type=file name="files[]" size=30>
+                </form>
+            </div>
+            <div class="form-group col-5">
+                <input type="text" class="form-control" id="contr_id" placeholder="Contract address">
+            </div>
+        </div>
+        <p id="error_log" class="small text-danger text-center m-0">Check Connection</p>
+        <div class="mt-2" id="contract_display">
+
+        </div>
+
+    </div>
+    <div id="main">
+
+    </div>
+
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.easing.min.js"></script>
+    <script src="js/wow.min.js"></script>
+    <script src="js/jquery.scrollTo.js"></script>
+    <script src="js/jquery.appear.js"></script>
+    <script src="js/stellar.js"></script>
+    <script src="plugins/cubeportfolio/js/jquery.cubeportfolio.min.js"></script>
+    <script src="js/owl.carousel.min.js"></script>
+    <script src="js/nivo-lightbox.min.js"></script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web3/1.3.5/web3.min.js" integrity="sha512-S/O+gH5szs/+/dUylm15Jp/JZJsIoWlpSVMwT6yAS4Rh7kazaRUxSzFBwnqE2/jBphcr7xovTQJaopiEZAzi+A==" crossorigin="anonymous"></script>
+    <!-- <script src="js/custom.js"></script> -->
+    <script>
+        var port = 7545;
+        var contract;
+        var accounts = [];
+        var web3 = new Web3("http://localhost:" + port);
+        var admin;
+        var contr = new web3.eth.Contract([], "")
+
+        async function handleFileSelect(evt) {
+            var files = evt.target.files;
+            f = files[0];
+            var reader = new FileReader();
+            reader.onload = await (function(theFile) {
+                return function(e) {
+                    contract = JSON.parse(e.target.result);
+                };
+            })(f);
+            await reader.readAsText(f);
+        }
+
+        $(document).ready(async() => {
+            await updateAccounts()
+            $("#accounts").change();
+
+        })
+
+        $("#host").keyup((e) => {
+            let temp = $(e.target).val();
+            if (temp > 1000) {
+                port = temp;
+                web3 = new Web3("http://localhost:" + port);
+                updateAccounts()
+                $("#accounts").change();
+            }
+        })
+        $("#upload").change(async(e) => {
+            await handleFileSelect(e)
+            $("#contract_display").html(`<div class="loader"></div>`)
+            setTimeout(() => {
+                contractDisplay()
+            }, 1000)
+        });
+
+        $("#accounts").change((e) => {
+            let temp = $(e.target).val()
+            web3.eth.getBalance(temp).then(bal => {
+                $("#balance").html(web3.utils.fromWei(bal, "ether"))
+            })
+        })
+
+
+        function contractDisplay() {
+            let html = `<table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Function Name</th>
+                                        <th scope="col">Input Params</th>
+                                        <th scope="col">Output Params</th>
+                                        <th scope="col">Type</th>
+                                    </tr>
+                                </thead>
+                            <tbody>`
+            let count = 0;
+            contract['abi'].forEach((element) => {
+                if (element.type == "function") {
+                    let fun_type = element.stateMutability;
+                    let x = [];
+                    let y = [];
+                    count++;
+                    element.inputs.forEach((e) => x.push(e.name))
+                    element.outputs.forEach((e) => y.push(e.name))
+
+                    html += `
+                            <tr class="">
+                                <th scope="row">${count}</th>
+                                <td>
+                                    <button class="btn btn-sm ${fun_type=="view"?"btn-danger":(fun_type=="nonpayable"?"btn-info":"btn-warning")}  ">${element.name}</button>
+                                </td>
+                                <td>
+                                    ${x.toString()}
+                                </td>
+                                <td>
+                                    ${y.toString()}
+                                </td>
+                                <td>
+                                    ${fun_type}
+                                </td>
+                            </tr>`
+
+
+                }
+            })
+            html += "</tbody> </table>"
+                //     html += `
+                //     <div class="text-center">
+                //     <button id="connect_btn" class="btn btn-info text-center " disabled>Connect</button>
+                // </div>`
+
+            $("#contract_display").html(html)
+        }
+        async function getAccountsDropdown() {
+            html = ""
+            await web3.eth.getAccounts().then(async(e) => {
+                accounts = e;
+                html = ""
+                await e.forEach((element, i) => {
+                    if (i == 0) {
+                        html += `<option value="${element}" selected>${element}</option> `
+                    } else {
+                        html += `<option value="${element}">${element}</option> `
+                    }
+                });
+            })
+            return html
+
+        }
+
+        async function updateAccounts() {
+            await $("#accounts").html(await getAccountsDropdown())
+        }
+
+        $("#contr_id").keyup((e) => {
+            // $("#connect_btn").removeAttr("disabled")
+            // $("#connect_btn").click((e) => {
+            let contr_id = $("#contr_id").val()
+            if (eval("contract?.abi == undefined")) {
+                $("#error_log").html("Enter Abi file")
+            } else if (contr_id == "") {
+                $("#error_log").html("Enter contract Id")
+            } else {
+                try {
+                    contr = new web3.eth.Contract(contract.abi, contr_id)
+                    $("#error_log").html("Connection successfully")
+                } catch (e) {
+                    $("#error_log").html(e)
+                }
+            }
+
+            // })
+
+        })
+    </script>
+
+    <script>
+        let count = 0
+        let count_list = [0]
+        let doctor_acc;
+        let current_patient;
+        $("#home").click((e) => {
+            $("body").removeClass("bg-white")
+            $(".collapse .nav li").removeClass("active")
+            $("#home_content").removeClass("d-none")
+            $("#home_act").addClass("active")
+            $("#top_area").removeClass("d-none")
+            $("#main").html("")
+        })
+
+        $("#admin").click((e) => {
+            $("body").addClass("bg-white")
+            $(".collapse .nav li").removeClass("active")
+            $("#home_content").addClass("d-none")
+            $("#admin_act").addClass("active")
+            $("#top_area").addClass("d-none")
+            $("#main").load("./admin.html")
+        })
+
+        $("#doctor").click((e) => {
+            $("body").addClass("bg-white")
+            $(".collapse .nav li").removeClass("active")
+            $("#home_content").addClass("d-none")
+            $("#doctor_act").addClass("active")
+            $("#top_area").addClass("d-none")
+            $("#main").load("./doctor.html")
+        })
+
+        $("#patient").click((e) => {
+            $("body").addClass("bg-white")
+            $(".collapse .nav li").removeClass("active")
+            $("#home_content").addClass("d-none")
+            $("#patient_act").addClass("active")
+            $("#top_area").addClass("d-none")
+            $("#main").load("./patient.html")
+        })
+    </script>
+</body>
+
+</html>

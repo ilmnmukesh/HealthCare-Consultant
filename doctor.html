@@ -1,0 +1,291 @@
+<div class="col-12 text-center mt-5">
+    <h1 class="text-info">Doctor-- Manage Patient</h1>
+</div>
+<div class="container " id='doctor_content'>
+    <div class="row" id="doctor_list">
+        <div class="loader"></div>
+    </div>
+    <div class="text-center col-12 mt-3">
+        <small class="text-danger font-weight-bold" id="error"></small>
+    </div>
+</div>
+
+<div id="doctor_main" class="container d-none">
+    <div class="text-center col-12 mt-3">
+        <small class="text-danger font-weight-bold" id="error_doc"></small>
+    </div>
+    <div class="row col-12">
+        <div class="container col-2" id="doctor_min">
+        </div>
+        <div class="col-9" id="doctor_patient_list">
+            <div class="loader"></div>
+        </div>
+    </div>
+</div>
+
+<div id="prescribe" class="container d-none">
+    <div class="text-center col-12 mt-3">
+        <small class="text-danger font-weight-bold" id="error_pres"></small>
+    </div>
+    <div class="row col-12">
+        <div class="container col-2" id="doctor_pres">
+        </div>
+        <div class="col-9 ">
+            <div id="doctor_prescribe_list">
+                <div class="loader"></div>
+            </div>
+            <div class="text-center" id="doctor_prescribe_btn">
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    $(document).ready(() => {
+        count = 0;
+        count_list = []
+        showDoctors()
+            //viewPatient("0x59dc7cce09d6A11D6aF5333D503edF23bFB521bb")
+        $("#doctor_prescribe_list").html("")
+        createButton()
+    })
+
+    async function showDoctors() {
+        var html = ``
+        if (admin == undefined || contract == undefined) {
+            $("#doctor_list").html(`
+                <div class="text-center col-12">
+                    <h1 class="text-danger mt-5">Admin or Contract is undefined<h1>
+                <div>
+                `)
+            return
+        }
+        await contr.methods.showDoctors().call({
+            from: admin,
+            gas: "3000000"
+        }).then(async e => {
+            if (e.length == 0) {
+                $("#doctor_list").html(`
+                <div class="text-center col-12">
+                    <h1 class="text-danger mt-5">Doctors Not added yet<h1>
+                <div>
+                `)
+                return
+            }
+
+            await e.forEach(async id => {
+                await contr.methods.doctors(id).call({
+                    from: admin,
+                    gas: "300000"
+                }).then(async data => {
+                    localStorage.setItem(data.id, JSON.stringify(data))
+                    html += await `
+					<div class="col-3">
+                        <div class="card" style="width: 24rem;">
+                            <img class="card-img-top" src="${data.image}" alt="Card image cap">
+                            <div class="card-body">
+                                <div>
+                                    <h6 class="my-0"><small class="text-info">Type: <span class="text-dark">${data.doctor_type}</span></small></h6>
+                                    <h6 class="my-0"><small class="text-info">Name: <span class="text-dark">${data.name}</span></small></h6>
+                                </div>
+                                <div class="form-group mt-3">
+                                    <button class="btn btn-sm btn-danger form-control" onclick="showPatientList('${data.id}')">View Patient</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					`
+                }).catch((err) => console.log(err.toString))
+            })
+
+            setTimeout(() => {
+                $("#doctor_list").html(html)
+            }, 2000)
+        })
+    }
+
+    async function showPatientList(addr) {
+        $("#error").html("")
+        contr.methods.showPatientList().call({
+            from: addr,
+            gas: 300000
+        }).then(e => {
+            console.log(e)
+            patientPage(e, JSON.parse(localStorage.getItem(addr)))
+        }).catch(e => $("#error").html(e.toString()))
+    }
+
+    function patientPage(data = [], c = {}) {
+        if (data.length == 0) {
+            $("#error").html("No Patient for This Doctor")
+            return
+        }
+        $("#doctor_content").addClass("d-none")
+        $("#doctor_main").removeClass("d-none")
+        $("#doctor_min").html(`
+            <img src="${c.image}" width="100px" />
+            <div>
+                <small class=" font-weight-bold ml-4 mt-2 text-info">${c.doctor_type}</small><br>
+                <small class=" font-weight-bold ml-4 text-danger">${c.name}</small><br>
+            </div>
+            <button class="btn btn-sm ml-3 mt-5 btn-warning" onclick="goBack()">back</button>
+        `)
+
+        var html = `
+		<h1 class=""><small>Patient List</small></h1>
+		<table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Gender</th>
+                    <th scope="col">Age</th>
+                    <th scope="col">Symptoms</th>
+                    <th scope="col">Problem</th>
+                    <th scope="col">Solution</th>
+                </tr>
+            </thead>
+            <tbody>`
+        count = 1
+        data.forEach(async(element) => {
+
+                    await contr.methods.showPatientProb(element).call({
+                            from: c.id,
+                            gas: 3000000
+                        }).then(data => {
+                                console.log(data)
+                                localStorage.setItem(data.id, JSON.stringify(data))
+                                html += `
+                    <tr>
+                        <th scope="row">${count++}</th>
+                        <th scope="row"><small>${data.name}</small></th>
+                        <th scope="row">${data.gender}</th>
+                        <th scope="row"><small>${data.age}</small></th>
+                        <th scope="row" class="text-danger">${data.symptom}</th>
+                        <th scope="row" class="text-warning">${data.problem}</th>
+                        <th scope="row" class="text-warning">
+                            ${
+                                data.prescribed?
+                                `<button class="btn btn-sm btn-danger" disabled >Prescribed</button>`:
+                                `<button class="btn btn-sm btn-success" onclick="viewPatient('${data.id}')">Prescribe</button>`
+                            }
+
+                            
+                        </th>
+                    </tr>
+                `
+            }).catch(e => $("#error").html(e.toString()))
+        })
+        setTimeout(() => {
+            html += `</tbody></table>`
+            $("#doctor_patient_list").html(html)
+        }, 1000)
+    }
+
+    function goBack() {
+        $("#doctor_content").removeClass("d-none")
+        $("#doctor_main").addClass("d-none")
+    }
+
+    function goBackDoc() {
+        $("#doctor_main").removeClass("d-none")
+        $("#prescribe").addClass("d-none")
+    }
+
+    function viewPatient(addr) {
+        $("#doctor_main").addClass("d-none")
+        $("#prescribe").removeClass("d-none")
+        if (localStorage.getItem(addr) == null) {
+            $("#error_doc").html("Patient address Not found")
+        }
+        var obj = JSON.parse(localStorage.getItem(addr))
+        $("#doctor_pres").html(`
+            <div>
+                <small class=" font-weight-bold ml-4 mt-2 text-info">${obj[1]}</small>
+                <small class=" font-weight-bold ml-4 mt-2 text-danger">:${obj[2]}</small><br>
+                <small class=" font-weight-bold ml-4 text-black">${obj[4]}</small><br>
+                
+                <small class=" font-weight-bold ml-4 mt-2 text-warning">${obj[3]}</small><br>
+                <small class=" font-weight-bold ml-4 mt-2 text-danger">${obj[5]}</small><br>
+            </div>
+            <button class="btn btn-sm ml-3 mt-5 btn-warning" onclick="goBackDoc()">back</button>
+        `)
+        $("#doctor_prescribe_btn").html(`<button class="btn btn-sm btn-success" onclick="sendPrescribe('${obj[0]}', '${obj[6]}')">Send Prescribe</button>`)
+
+    }
+
+    function createButton() {
+        $("#doctor_prescribe_list").append(`
+            <div class="row" id="btn_pres_${count}">
+                <div class="form-group col-5">
+                    <input type="text" class="form-control" id="tablets_${count}" placeholder="Tablet Name">
+                </div>
+                <div class="form-group col-2">
+                    <input type="number" class="form-control" id="count_${count}" placeholder="Count">
+                </div>
+                <div class="form-group col-2">
+                    <input type="text" class="form-control" id="time_${count}" placeholder="When">
+                </div>
+                <div class="form-group col-3">
+                    <button class="form-control btn btn-sm btn-primary" id="btn_tab_${count}" onclick="addButton(${count})">Add</button>
+                </div>
+            </div>
+        `)
+        count++
+    }
+
+    function deleteButton(id) {
+        $("#btn_pres_" + id).remove()
+        index = count_list.indexOf(id);
+        if (index > -1) {
+            count_list.splice(index, 1);
+        }
+    }
+
+    function addButton(id) {
+        $("#error_pres").html("")
+        if ($("#tablets_" + id).val() == "" || $("#count_" + id).val() == "" || $("#time_" + id).val() == "") {
+            $("#error_pres").html("All Fields Required")
+            return
+        }
+        $("#tablets_" + id).attr("disabled", "disabled")
+        $("#count_" + id).attr("disabled", "disabled")
+        $("#time_" + id).attr("disabled", "disabled")
+        $("#btn_tab_" + id).removeClass("btn-primary")
+        $("#btn_tab_" + id).addClass("btn-danger")
+        $("#btn_tab_" + id).html("Delete")
+        $("#btn_tab_" + id).attr("onclick", `deleteButton(${id})`)
+        count_list.push(id)
+        createButton()
+    }
+
+    function sendPrescribe(addr, doc) {
+        $("#error_pres").html("")
+        if (count_list.length == 0) {
+            $("#error_pres").html("Add Some Prescribtion")
+            return
+        }
+        let arr = []
+        count_list.forEach((element) => {
+            let obj = {
+                tablet: $("#tablets_" + element).val(),
+                count: $("#count_" + element).val(),
+                time: $("#time_" + element).val(),
+            }
+            arr.push(obj)
+        })
+        contr.methods.wrotePrescription(addr, JSON.stringify(arr)).send({
+            from: doc,
+            gas: 3000000
+        }).then(e => {
+            $("#error_pres").html("Success!!")
+            goBackDoc()
+            showPatientList(doc)
+        }).catch(e => {
+            $("#error_pres").html(e.toString())
+        })
+    }
+</script>

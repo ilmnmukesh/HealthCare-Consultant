@@ -1,0 +1,161 @@
+<!-- <div class="navbar navbar-custom navbar-static-top shadow-none border-0">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light col-12">
+        <div class="navbar-header page-scroll col-5">
+            <a class="navbar-brand">Admin</a>
+        </div>
+        <div class="collapse navbar-collapse " id="navbarTogglerDemo01">
+            <ul class="nav navbar-nav ">
+                <li id="admin_home_act" class="active"><a href="#patient.html">My Home</a></li>
+                <li id="admin_adddoc_act"><a href="#adddoc.html">Add Doctor</a></li>-->
+<!-- <li id="admin_view_act"><a href="#viewdoc.html">View Doctor</a></li> -->
+<!--<li><a onclick="$('#home').click()">Back</a></li>
+            </ul>
+        </div>
+    </nav>
+</div> -->
+
+<div class="col-12 text-center mt-5">
+    <h1 class="text-info">Admin-- Manage Doctor</h1>
+</div>
+
+<div class="container-fluid row">
+    <div class="col-5">
+
+        <div class="form-group">
+            <h1 class=""><small>Add Doctors</small></h1>
+            <div class="form-group col-12">
+                <select class="custom-select btn btn-sm btn-info" id="accounts_for_doctor" style="height: 40px;font-size: small; font-weight: 400;">
+					<option selected>Choose...</option>
+					<option value="1">One</option>
+					<option value="2">Two</option>
+					<option value="3">Three</option>
+				</select>
+            </div>
+            <div class="form-group col-12">
+                <input type="text" class="form-control" id="doc_type" placeholder="Doctor type">
+            </div>
+            <div class="form-group col-12">
+                <input type="text" class="form-control" id="doc_name" placeholder="Doctor Name">
+            </div>
+            <div class="form-group col-12">
+                <input type="text" class="form-control" id="doc_img" placeholder="Doctor Image">
+            </div>
+            <div class="text-center col-12 mb-3">
+                <small class="text-danger font-weight-bold" id="error"></small>
+            </div>
+            <div class="form-group col-12 text-center">
+                <button onclick="addDoctors()" class="form-control btn btn-sm btn-success">Add</button>
+            </div>
+        </div>
+    </div>
+    <div class="col-7" id="view_doc_table">
+        <div class="loader"></div>
+    </div>
+
+</div>
+
+<script>
+    $(document).ready(async() => {
+        admin = $("#accounts").val()
+        await $("#accounts_for_doctor").html(await getAccountsDropdown())
+        await check()
+    })
+
+    async function check() {
+        if (admin == undefined || contract == undefined) {
+            $("#view_doc_table").html(`
+                <div class="text-center col-12">
+                    <h1 class="text-danger mt-5">Admin or Contract is undefined<h1>
+                <div>
+                `)
+            return
+        }
+        var html = `
+		<h1 class=""><small>Doctors List</small></h1>
+		<table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Doctor Id</th>
+                    <th scope="col">Doctor Name</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Image</th>
+                </tr>
+            </thead>
+            <tbody>`
+        await contr.methods.showDoctors().call({
+            from: admin,
+            gas: "3000000"
+        }).then(async e => {
+            let count = 1;
+            if (e.length == 0) {
+                $("#view_doc_table").html(`
+                <div class="text-center col-12">
+                    <h1 class="text-danger mt-5">Doctors Not added yet<h1>
+                <div>
+                `)
+                return
+            }
+            await e.forEach(async id => {
+                await contr.methods.doctors(id).call({
+                    from: admin,
+                    gas: "300000"
+                }).then(async data => {
+                    html += await `
+					<tr>
+            <th scope="row">${count++}</th>
+            <th scope="row"><small>${data.id}</small></th>
+            <th scope="row">${data.name}</th>
+            <th scope="row"><small>${data.doctor_type}</small></th>
+            <th scope="row"><img src="${data.image}" width="40"></th>
+        </tr>
+					`
+                }).catch((err) => console.log(err.toString))
+            })
+
+            setTimeout(() => {
+                html += `</tbody>
+        </table>`
+                $("#view_doc_table").html(html)
+            }, 2000)
+        })
+    }
+
+    async function addDoctors() {
+        if (admin == undefined || contract == undefined) {
+            $("#error").html(`Admin or Contract is undefined`)
+            return
+        }
+        let id = $("#accounts_for_doctor").val()
+        let type = $("#doc_type").val()
+        let name = $("#doc_name").val()
+        let img = $("#doc_img").val()
+        if (id == "") {
+            $("#error").html("Id Not Null")
+            return
+        } else if (type == "") {
+            $("#error").html("Doctor Type is required")
+            return
+        } else if (name == "") {
+            $("#error").html("Doctor Name is required")
+            return
+        } else if (img == "") {
+            $("#error").html("Doctor Image is required")
+            return
+        }
+        await contr.methods.enrollDoctor(id, type, name, img).send({
+            from: admin,
+            gas: 3000000
+        }).then((e) => {
+            console.log(e)
+            $("#error").html(e)
+            $("#doc_type").val("")
+            $("#doc_name").val("")
+            $("#doc_img").val("")
+            $("#view_doc_table").html(`<div class="loader"></div>`)
+            check();
+        }).catch((e) => {
+            $("#error").html(e)
+        })
+    }
+</script>
